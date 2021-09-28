@@ -1,12 +1,16 @@
 #include <iostream>
 
-using namespace std;
-
 auto soma(auto a, auto b) {
     return a + b;
 }
-
+auto subtracao(auto a, auto b){
+	return a - b;
+}
 int main() {
-    std::cout << soma(5, 6) << '\n';
+    int num1 = 0, num2 = 0;
+    std::cin >> num1 >> num2;
+    
+    std::cout << "Soma: "<< soma(num1, num2) << '\n';
+    std::cout << "Subtracao: "<< subtracao(num1, num2) << '\n';
     return 0;
 }
