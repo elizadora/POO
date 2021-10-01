@@ -124,11 +124,10 @@ std::string mais_homens_ou_mulheres(std::vector<int> fila) {
    int contM = 0;
 
    for (int i = 0; i < (int)fila.size(); i++) {
-      if (fila[i] > 0){
+      if (fila[i] > 0)
          contH++;
-      }else {
+      else
          contM++;
-      }
    }
 
    if (contH == contM)
@@ -187,7 +186,7 @@ std::string homens_sao_mais_estressados_que_mulheres(std::vector<int> fila) {
 }
 
 int main() {
-   
 
+   
    return 0;
 }
