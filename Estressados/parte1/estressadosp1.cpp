@@ -110,6 +110,7 @@ float calcular_stress_medio(std::vector<int> fila) {
    for (int i = 0; i < (int)fila.size(); i++) {
       if (fila[i] < 0) {
          media += fila[i] * -1;
+         
       }else{
          media += fila[i];
       }
@@ -147,6 +148,7 @@ std::string qual_metade_eh_mais_estressada(std::vector<int> fila) {
    for (int i = 0; i < (int)fila.size(); i++) {
       if (i < ((int)fila.size() / 2)) {
          contPrimeira += abs(fila[i]);
+
       }else {
          contSegunda += abs(fila[i]);
       }
@@ -170,8 +172,8 @@ std::string homens_sao_mais_estressados_que_mulheres(std::vector<int> fila) {
       if (fila[i] > 0) {
          contH++;
          mediaHomem += fila[i];
-      }
-      else {
+
+      }else {
          contM++;
          mediaMulher += fila[i] * -1;
       }
