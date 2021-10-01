@@ -160,22 +160,18 @@ std::string qual_metade_eh_mais_estressada(std::vector<int> fila) {
       return "segunda";
 }
 
-std::string homens_sao_mais_estressados_que_mulheres(std::vector<int> fila)
-{
+std::string homens_sao_mais_estressados_que_mulheres(std::vector<int> fila) {
    int contH = 0;
    int contM = 0;
    float mediaHomem = 0;
    float mediaMulher = 0;
 
-   for (int i = 0; i < (int)fila.size(); i++)
-   {
-      if (fila[i] > 0)
-      {
+   for (int i = 0; i < (int)fila.size(); i++) {
+      if (fila[i] > 0) {
          contH++;
          mediaHomem += fila[i];
       }
-      else
-      {
+      else {
          contM++;
          mediaMulher += fila[i] * -1;
       }
