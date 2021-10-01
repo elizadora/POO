@@ -12,5 +12,7 @@ int main() {
     
     std::cout << "Soma: "<< soma(num1, num2) << '\n';
     std::cout << "Subtracao: "<< subtracao(num1, num2) << '\n';
+    std::cout << __cplusplus << std::endl;
+
     return 0;
 }
