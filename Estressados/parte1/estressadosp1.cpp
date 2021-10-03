@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-
+#include <cmath>
 
 //Busca
 
@@ -183,6 +183,8 @@ bool homens_sao_mais_estressados_que_mulheres(std::vector<int> fila) {
       return false;
 }
 
+
+
 int main() {
 
    //Busca
@@ -197,7 +199,6 @@ int main() {
    std::cout << procurar_valor({1, 3, 45, -9, -12, -99, 2, -99}, -2) << "\n"; //-1
 
    std::cout << procurar_valor_apos({1, 3, 45, -9, -12, -99, 2, -99}, -99, 6) << "\n"; //7
-   std::cout << procurar_valor_apos({1, 3, 45, -9, -12, -99, 2, -99}, -99, 5) << "\n"; //5
    std::cout << procurar_valor_apos({1, 3, 45, -9, -12, -99, 2, -99}, 2, 5) << "\n"; //6
 
 
