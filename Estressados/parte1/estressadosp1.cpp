@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <cmath>
 
 //Busca
 
@@ -144,9 +143,9 @@ std::string qual_metade_eh_mais_estressada(std::vector<int> fila) {
 
    for (int i = 0; i < (int)fila.size(); i++) {
       if (i < ((int)fila.size() / 2))
-         contPrimeira += abs(fila[i]);
+         contPrimeira += std::abs(fila[i]);
       else
-         contSegunda += abs(fila[i]);
+         contSegunda += std::abs(fila[i]);
    }
 
    if (contPrimeira == contSegunda)
