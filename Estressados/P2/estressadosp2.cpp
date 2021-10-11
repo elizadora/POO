@@ -124,6 +124,7 @@ std::vector<int> diferentes(const std::vector<int>& fila){
   std::vector<int> exclu = fila;
   
   for(int i = 0; i < (int) exclu.size(); i++){
+    exclu[i] = abs(exclu[i]);
     for(int h = 0; h < (int) exclu.size(); h++){
       if(h != i && abs(exclu[i]) == abs(exclu[h])){
           exclu.erase(exclu.begin() + h);
@@ -159,34 +160,34 @@ int main(){
   
   //Filtro 
 
-  novaFila = clone(fila);
-  print(novaFila);
+  // novaFila = clone(fila);
+  // print(novaFila);
 
-  novaFila = pegar_homens(fila);
-  print(novaFila);
+  // novaFila = pegar_homens(fila);
+  // print(novaFila);
 
-  novaFila = pegar_calmos(fila);
-  print(novaFila);
+  // novaFila = pegar_calmos(fila);
+  // print(novaFila);
   
-  novaFila = pegar_mulheres_calmas(fila);
-  print(novaFila);
+  // novaFila = pegar_mulheres_calmas(fila);
+  // print(novaFila);
   
 
   //Acesso 
 
-  novaFila = inverter_com_copia(fila);
-  print(novaFila);
+  // novaFila = inverter_com_copia(fila);
+  // print(novaFila);
 
-  inverter_inplace(fila);
-  print(fila);
+  // inverter_inplace(fila);
+  // print(fila);
 
-  std::cout << sortear(fila) << '\n';
+  // std::cout << sortear(fila) << '\n';
 
-  embaralhar(fila);
-  print(fila);
+  // embaralhar(fila);
+  // print(fila);
 
-  ordenar(fila);
-  print(fila);
+  // ordenar(fila);
+  // print(fila);
 
 
   //Conjuntos
