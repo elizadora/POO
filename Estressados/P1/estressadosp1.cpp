@@ -46,6 +46,8 @@ int procurar_valor_apos(std::vector<int> fila, int valorBusca, int pos) {
 int procurar_menor(std::vector<int> fila) {
    int min = 0;
 
+   if(fila.empty()) return 0;
+
    for (int i = 0; i < (int)fila.size(); i++) {
       if (fila[i] < fila[min])
          min = i;
@@ -56,6 +58,8 @@ int procurar_menor(std::vector<int> fila) {
 
 int procurar_maior(std::vector <int> fila){
    int max = 0;
+
+   if(fila.empty()) return 0;
 
    for (int i = 0; i < (int) fila.size(); i++){
       if(fila[i] > fila[max])
@@ -68,6 +72,8 @@ int procurar_maior(std::vector <int> fila){
 int procurar_menor_pos(std::vector<int> fila) {
    int min = 0;
 
+   if(fila.empty()) return -1;
+
    for (int i = 0; i < (int)fila.size(); i++) {
       if (fila[i] < fila[min])
          min = i;
@@ -79,6 +85,8 @@ int procurar_menor_pos(std::vector<int> fila) {
 int procurar_menor_pos_apartir(std::vector<int> fila, int pos) {
    int menorApos = pos;
 
+   if(fila.empty()) return -1;
+
    for (int i = pos; i < (int)fila.size(); i++) {
       if (fila[i] < fila[menorApos])
          menorApos = i;
@@ -88,34 +96,39 @@ int procurar_menor_pos_apartir(std::vector<int> fila, int pos) {
 }
 
 int procurar_melhor_pos_se(std::vector<int> fila) {
-   int posHC = 0;
+  int posHC = 0;
 
-   for (int i = 0; i < (int)fila.size(); i++) {
-      if ((fila[i] > 0) && (fila[i] < fila[posHC]))
-         posHC = i;
-   }
+    if (!fila.empty()){
+        for (int i = 0; i < (int)fila.size(); i++){
+            if ((fila[i] > 0) && (fila[i] < fila[posHC]))
+                posHC = i;
+        }
 
-   if (fila[posHC] > 0)
-      return posHC;
+        if (fila[posHC] > 0)
+            return posHC;
+    }
 
-
-   return -1;
+    return -1;
 }
 
 // Contagem
 
 float calcular_stress_medio(std::vector<int> fila) {
-   float media = 0;
-   for (int i = 0; i < (int)fila.size(); i++) {
-      if (fila[i] < 0)
-         media += fila[i] * -1;
-      else
-         media += fila[i];
-   }
+    float media = 0;
 
-   media = media / (int)fila.size();
+    if (fila.empty())
+        return 0;
 
-   return media;
+    for (int i = 0; i < (int)fila.size(); i++) {
+        if (fila[i] < 0)
+            media += fila[i] * -1;
+        else
+            media += fila[i];
+    }
+
+    media = media / (int)fila.size();
+
+    return media;
 }
 
 std::string mais_homens_ou_mulheres(std::vector<int> fila) {
@@ -162,6 +175,8 @@ bool homens_sao_mais_estressados_que_mulheres(std::vector<int> fila) {
    float mediaHomem = 0;
    float mediaMulher = 0;
 
+   if(fila.empty()) return false;
+
    for (int i = 0; i < (int)fila.size(); i++) {
       if (fila[i] > 0) {
          contH++;
@@ -173,15 +188,14 @@ bool homens_sao_mais_estressados_que_mulheres(std::vector<int> fila) {
       }
    }
 
-   mediaMulher = mediaMulher / contM;
-   mediaHomem = mediaHomem / contH;
+   if(contM > 0) mediaMulher = mediaMulher / contM;
+   if(contH > 0) mediaHomem = mediaHomem / contH;
 
    if (mediaHomem > mediaMulher)
       return true;
    else
       return false;
 }
-
 
 
 int main() {
