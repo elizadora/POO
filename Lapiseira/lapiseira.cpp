@@ -107,66 +107,74 @@ struct Lapiseira {
                 this->grafite = nullptr;
             }
             if (folhas > 0){
-                std::cout << "Foram escritas: " << temp << " folhas";
+                std::cout << "Foram escritas: " << temp << " folhas\n";
             }
                
         }
     }
 };
 
-bool controle(Lapiseira &lapiseira) {
+void controle(Lapiseira &lapiseira) {
 
     std::string linha{""};
 
-    std::cout << "$";
-    getline(std::cin, linha);
+    while (true) {
+        std::cout << "$";
+        getline(std::cin, linha);
 
-    std::stringstream ss(linha);
+        std::stringstream ss(linha);
 
-    std::string comando;
+        std::string comando;
 
-    ss >> comando;
+        ss >> comando;
 
-    if (comando == "init") {
-        float calibre;
-        ss >> calibre;
-        lapiseira.calibre = calibre;
+        if (comando == "init") {
+            float calibre;
+            ss >> calibre;
+            lapiseira.calibre = calibre;
+        }
+        else if (comando == "show") {
+            std::cout << lapiseira;
+        }
+        else if (comando == "insert") {
+
+            float calibre;
+            std::string dureza;
+            int tamanho;
+
+            ss >> calibre >> dureza >> tamanho;
+
+            Grafite *grafite = new Grafite{calibre, dureza, tamanho};
+            if(!lapiseira.inserirGrafite(grafite)){
+                delete grafite;
+            }
+
+        }
+        else if (comando == "remove") {
+            Grafite *grafite = lapiseira.removerGrafite();
+            if(grafite == nullptr){
+                delete grafite;
+            }
+        }
+        else if (comando == "write") {
+            int folhas;
+            ss >> folhas;
+            lapiseira.escreverFolhas(folhas);
+        }
+        else if (comando == "end") {
+            break;
+        }
+        else{
+            std::cout << "Comando nao existe\n";
+        }
     }
-    if (comando == "show") {
-        std::cout << lapiseira;
-    }
-    if (comando == "insert") {
-
-        float calibre;
-        std::string dureza;
-        int tamanho;
-
-        ss >> calibre >> dureza >> tamanho;
-
-        Grafite *grafite = new Grafite{calibre, dureza, tamanho};
-        lapiseira.inserirGrafite(grafite);
-
-        return true;
-    }
-    if (comando == "remove") {
-        lapiseira.removerGrafite();
-    }
-    if (comando == "write") {
-        int folhas;
-        ss >> folhas;
-        lapiseira.escreverFolhas(folhas);
-    }
-    if (comando == "end") {
-        return false;
-    }
-
-    return true;
+    
 }
 
 int main() {
     Lapiseira lapiseira;
 
-    while (controle(lapiseira));
+    controle(lapiseira);
 
     return 0;
 }
