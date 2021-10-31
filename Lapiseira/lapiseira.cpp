@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 struct Grafite {
 
@@ -7,26 +8,31 @@ struct Grafite {
     std::string dureza;
     int tamanho;
 
-    Grafite(float calibre = 0, std::string dureza = "", int tamanho = 0) : calibre{calibre}, dureza{dureza}, tamanho{tamanho}{
+    Grafite(float calibre = 0, std::string dureza = "", int tamanho = 0) : calibre{calibre}, dureza{dureza}, tamanho{tamanho} {
     }
-    
+
     friend std::ostream &operator<<(std::ostream &os, const Grafite &lapiseira) {
 
         os << "Grafite: [" << lapiseira.calibre << ":" << lapiseira.dureza << ":" << lapiseira.tamanho << "]\n";
 
         return os;
     }
-    
+
     int desgastePorFolha() {
+
         if (this->dureza == "HB") {
             return 1;
-        }else if (this->dureza == "2B") {
+        }
+        else if (this->dureza == "2B") {
             return 2;
-        }else if (this->dureza == "4B") {
+        }
+        else if (this->dureza == "4B") {
             return 4;
-        }else if (this->dureza == "6B") {
+        }
+        else if (this->dureza == "6B") {
             return 6;
-        }else {
+        }
+        else {
             return 0;
         }
     }
@@ -35,76 +41,77 @@ struct Grafite {
 struct Lapiseira {
 
     float calibre;
-    Grafite *grafite;
+    std::vector<Grafite> grafites;
 
-    Lapiseira(float calibre = 0, Grafite *grafite = nullptr) : calibre{calibre}, grafite{grafite} {
+    Lapiseira(float calibre = 0) : calibre{calibre} {
     }
 
     friend std::ostream &operator<<(std::ostream &os, const Lapiseira &lapiseira) {
-        os << "Calibre: " << lapiseira.calibre << ", ";
-
-        if (nullptr == lapiseira.grafite) {
+        
+        os << "Calibre: " << lapiseira.calibre << "\n";
+        if(lapiseira.grafites.empty()){
             os << "Grafite: null\n";
-        }else {
-            os << *lapiseira.grafite;
-        }
+        }else{
+            for (int i = 0; i < (int)lapiseira.grafites.size(); i++) {
+                os << lapiseira.grafites[i];
+            }   
 
+        }
         return os;
     }
 
-    bool inserirGrafite(Grafite *grafite) {
+    bool inserirGrafite(Grafite &grafite) {
 
-        if (this->grafite != nullptr) {
-            std::cout << "Uma grafite ja foi inserida\n";
-            return false;
+        if (grafite.calibre != this->calibre) {
+            std::cout << "Calibre incorreto\n";
+            return true;
         }
-
-        if (this->calibre != grafite->calibre) {
-            std::cout << "O calibre da grafite é incompatível com o da lapiseira\n";
-            return false;
+        if ((int)this->grafites.size() == 4) {
+            std::cout << "Quantidade maxima de grafites foi atingida\n";
+            return true;
         }
-
-        this->grafite = grafite;
+        this->grafites.push_back(grafite);
 
         return true;
     }
 
-    Grafite *removerGrafite() {
-        if (this->grafite == nullptr) {
-            std::cout << "A lapiseira nao tem grafite\n";
-        }
+    std::vector<Grafite> removerGrafite(int i) {
 
-        Grafite *temp = this->grafite;
-        this->grafite = nullptr;
+        if (this->grafites.empty()) {
+            std::cout << "Nenhuma grafite foi inserida\n";
+            return this->grafites;
+        }
+        std::vector<Grafite> temp = this->grafites;
+        this->grafites.erase(this->grafites.begin() + i);
+
         return temp;
     }
 
     void escreverFolhas(int folhas) {
         int temp = 0;
 
-        if (this->grafite == nullptr) {
+        if (this->grafites.empty()) {
             std::cout << "A grafite ainda nao foi inserida para poder escrever\n";
-        }
-        else {
-            while (this->grafite->tamanho > 0 && folhas > 0) {
-                if (this->grafite->tamanho - this->grafite->desgastePorFolha() < 0){
-                    break;
+
+        }else {
+
+            for (int i = 0; i < (int)this->grafites.size(); i++) {
+                while (this->grafites[i].tamanho > 0 && folhas > 0) {
+                    this->grafites[i].tamanho -= this->grafites[i].desgastePorFolha();
+
+                    if (this->grafites[i].tamanho >= 0) {
+                        folhas--;
+                        temp++;
+                    }
+                    if (this->grafites[i].tamanho <= 0) {
+                        this->grafites.erase(this->grafites.begin() + i);
+                    }
                 }
-
-                this->grafite->tamanho -= this->grafite->desgastePorFolha();
-                folhas--;
-                temp++;
             }
-
-            if (this->grafite->tamanho == 0) {
-                std::cout << "A grafite acabou\n";
-                delete this->grafite;
-                this->grafite = nullptr;
+            if (folhas > 0 && this->grafites.empty()) {
+                std::cout << "As grafites acabaram\n";
+                std::cout << "Foram escritas apenas: " << temp << " folhas\n";
             }
-            if (folhas > 0){
-                std::cout << "Foram escritas: " << temp << " folhas\n";
-            }
-               
         }
     }
 };
@@ -113,7 +120,7 @@ void controle(Lapiseira &lapiseira) {
 
     std::string linha{""};
 
-    while (true) {
+   while(true){
         std::cout << "$";
         getline(std::cin, linha);
 
@@ -139,21 +146,21 @@ void controle(Lapiseira &lapiseira) {
 
             ss >> calibre >> dureza >> tamanho;
 
-            Grafite *grafite = new Grafite{calibre, dureza, tamanho};
-            if(!lapiseira.inserirGrafite(grafite)){
-                delete grafite;
-            }
+            Grafite grafite{calibre, dureza, tamanho};
+            lapiseira.inserirGrafite(grafite);
 
         }
         else if (comando == "remove") {
-            Grafite *grafite = lapiseira.removerGrafite();
-            if(grafite == nullptr){
-                delete grafite;
-            }
+            int i;
+            ss >> i;
+
+            lapiseira.removerGrafite(i);
         }
         else if (comando == "write") {
             int folhas;
+
             ss >> folhas;
+
             lapiseira.escreverFolhas(folhas);
         }
         else if (comando == "end") {
@@ -162,14 +169,13 @@ void controle(Lapiseira &lapiseira) {
         else{
             std::cout << "Comando nao existe\n";
         }
-    }
-    
+   }
 }
 
 int main() {
     Lapiseira lapiseira;
 
-    controle(lapiseira);
+   controle(lapiseira);
 
     return 0;
 }
