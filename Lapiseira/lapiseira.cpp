@@ -52,11 +52,6 @@ struct Lapiseira {
         return os;
     }
 
-
-    void orint() {
-        std::cout << this->grafite->calibre;
-    }
-
     bool inserirGrafite(Grafite *grafite) {
 
         if (this->grafite != nullptr) {
