@@ -164,7 +164,6 @@ void controle(Sala &sala){
 }
 
 int main(){
-    
     Sala sala;
 
     controle(sala);
