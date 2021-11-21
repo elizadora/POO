@@ -68,7 +68,7 @@ class Trampoline{
 
         }
 
-        friend std::ostream &operator<<(std::ostream& os, Trampoline &trampoline){
+        friend std::ostream &operator<<(std::ostream& os, const Trampoline &trampoline){
             os << "=> ";
             if(!trampoline.waiting.empty()){
                 for(auto it = trampoline.waiting.rbegin();  it != trampoline.waiting.rend(); it++){

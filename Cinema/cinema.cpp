@@ -17,11 +17,11 @@ class Client{
             return os;
         }
 
-        std::string getId() const{
+        std::string getId(){
             return this->id;
         }
 
-        std::string getFone() const{
+        std::string getFone(){
             return this->fone;
         }
 
