@@ -133,12 +133,11 @@ void controle(Contact& contact){
 
             ss >> name;
             
-            if(contact.getName() == ""){
-                contact.setName(name);
-            }else{
-                contact.setName(name);
+            if(contact.getName() != ""){
                 contact.clearFones();
             }
+
+            contact.setName(name);
 
         }
 
