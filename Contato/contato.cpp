@@ -109,6 +109,9 @@ class Contact{
             }
         }
 
+        void clearFones(){
+            this->fones.clear();
+        }
 
 };
 
@@ -127,20 +130,15 @@ void controle(Contact& contact){
 
         if(comando == "init"){
             std::string name;
-            std::string id;
-            std::string number;
-            std::vector<Fone> fones;
 
             ss >> name;
-
-            while(ss >> id >> number){
-                Fone fone(id, number);
-                fones.push_back(fone);
+            
+            if(contact.getName() == ""){
+                contact.setName(name);
+            }else{
+                contact.setName(name);
+                contact.clearFones();
             }
-
-            Contact contAux(name, fones);
-
-            contact = contAux;
 
         }
 
