@@ -26,3 +26,6 @@
 
 | [Contato](https://github.com/elizadora/POO/tree/main/Contato) |
 | ------------------------------------------------------------- |
+
+| [Busca](https://github.com/elizadora/POO/tree/main/Busca) |
+| ------------------------------------------------------------- |
