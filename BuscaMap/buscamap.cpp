@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
+#include <map>
 
 class Fone{
     private:
@@ -114,23 +115,7 @@ class Contact{
 
 class Agenda{
     private:
-        std::vector<Contact> contacts;
-
-        int findPos(std::string name){
-            for(int i = 0; i < (int) this->contacts.size(); i++){
-                if(name == contacts[i].getName()){
-                    return i;
-                }
-            }
-
-            return -1;
-        }
-
-        void ordernar(){
-            std::sort(this->contacts.begin(), this->contacts.end(), [](Contact contact1, Contact contact2){
-                return contact1.getName() < contact2.getName();
-            });
-        }
+        std::map<std::string, Contact> contacts;
     
     public:
         Agenda(){
@@ -139,13 +124,13 @@ class Agenda{
 
         friend std::ostream& operator<<(std::ostream& os, Agenda agenda){
             for(auto contato : agenda.contacts){
-                os << contato << '\n';
+                os << contato.second << '\n';
             }
 
             return os;
         }
 
-        void breakFone(std::stringstream& ss, Contact& contact){
+        void breakFone(std::stringstream& ss, Contact* contact){
             std::string temp;
 
             while(ss >> temp){
@@ -159,52 +144,51 @@ class Agenda{
 
                Fone fone(id, number);
 
-               contact.addFone(fone);
+               contact->addFone(fone);
            }
         }
 
         void addContact(Contact contact){
-            int pos = findPos(contact.getName());
+            auto it = contacts.find(contact.getName());
 
-            if(pos == -1){
+            if(it != contacts.end()){
+                for(Fone fone : contact.getFones()){
+                    contacts[contact.getName()].addFone(fone);
+                }
+                
+            }else{
                 if(contact.getFones().size() > 0){
-                    this->contacts.push_back(contact);
+                    contacts[contact.getName()] = contact;
                 }else{
                     std::cout << "Sem telefones\n";
                 }
-            }else{
-                for(Fone fone : contact.getFones()){
-                    this->contacts[pos].addFone(fone);
-                }
             }
-            ordernar();
         }
 
         Contact* getContact(std::string name){
-            int pos = findPos(name);
+            auto it = contacts.find(name);
 
-            if(pos != -1){
-                return &this->contacts[pos];
+            if(it != contacts.end()){
+                return &it->second;
+            }else{
+                return nullptr;
             }
-
-            return nullptr;
         }
 
         void rmContact(std::string name){
-            int pos = findPos(name);
+            auto it = contacts.find(name);
 
-            if(pos != -1){
-                this->contacts.erase(this->contacts.begin() + pos);
-
+            if(it != contacts.end()){
+                contacts.erase(it);
             }else{
-                std::cout << "Contato invalido\n";
+                std::cout << "Contato nao encontrado\n";
             }
         }
 
         std::vector<Contact> search(std::string pattern){
             std::vector<Contact> result;
 
-            for(auto& contact : this->contacts){
+            for(auto& [id, contact] : this->contacts){
                 std::stringstream ss;
                 ss << contact;
 
@@ -218,7 +202,7 @@ class Agenda{
             return result;
         }
 
-        std::vector<Contact> getContacts(){
+        std::map<std::string, Contact> getContacts(){
             return this->contacts;
         }
 };
@@ -249,9 +233,10 @@ void controle(Agenda& agenda){
            std::string name;
 
            ss >> name;
+        
             Contact contact;
             contact.setName(name);
-            agenda.breakFone(ss, contact);
+            agenda.breakFone(ss, &contact);
             agenda.addContact(contact);
         }
 

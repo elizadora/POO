@@ -29,3 +29,9 @@
 
 | [Busca](https://github.com/elizadora/POO/tree/main/Busca) |
 | ------------------------------------------------------------- |
+
+| [Busca com Map](https://github.com/elizadora/POO/tree/main/BuscaMap) |
+| ------------------------------------------------------------- |
+
+| [Cinema com Map](https://github.com/elizadora/POO/tree/main/CinemaMap) |
+| ------------------------------------------------------------- |
