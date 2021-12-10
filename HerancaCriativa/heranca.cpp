@@ -77,21 +77,21 @@ public:
 };
 
 
-class Lobo : public Mammal{
+class Wolf : public Mammal{
 
 private:
     std::string species;
     
 public:
-    Lobo(std::string nick = "", std::string species = "", std::string habitat = "") : Mammal{"carnivoro", habitat}, species{species} {
+    Wolf(std::string nick = "", std::string species = "", std::string habitat = "") : Mammal{"carnivoro", habitat}, species{species} {
         this->nickname = nick;
     }
 
-    friend std::ostream &operator<<(std::ostream& os, const Lobo& lobo){
-        const Mammal& mammal = lobo;
+    friend std::ostream &operator<<(std::ostream& os, const Wolf& wolf){
+        const Mammal& mammal = wolf;
 
        
-        os << "especie: " << lobo.species << "\napelido: " << lobo.nickname << "\n" << mammal;
+        os << "apelido: " << wolf.nickname << "\nespecie: " << wolf.species << "\n" << mammal;
 
         return os;
      }
@@ -114,7 +114,7 @@ public:
 
 void controle() {
 
-    Lobo lobo;
+    Wolf wolf;
 
     std::string linha{""};
 
@@ -135,16 +135,16 @@ void controle() {
 
             ss >> nick >> species >> habitat;
 
-            lobo = Lobo(nick, species, habitat);
+            wolf = Wolf(nick, species, habitat);
         }
         else if (comando == "show") {
-            std::cout << lobo;
+            std::cout << wolf;
         }
         else if (comando == "hunt") {
-            lobo.hunt();
+            wolf.hunt();
         }
         else if (comando == "dead") {
-            lobo.dead();
+            wolf.dead();
         }
         else if (comando == "end") {
             break;
