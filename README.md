@@ -41,3 +41,6 @@
 
 | [Cadastro e Banco 2](https://github.com/elizadora/POO/tree/main/CadastroEhBanco) |
 | ------------------------------------------------------------- |
+
+| [Twitter](https://github.com/elizadora/POO/tree/main/Twitter) |
+| ------------------------------------------------------------- |
