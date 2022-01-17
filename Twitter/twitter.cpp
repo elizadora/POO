@@ -1,22 +1,18 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <vector>
 #include <stdexcept>
 #include <sstream>
 
 class Message{
     int id;
-    std::set<std::string> likes;
-    std::string msg;
     std::string username;
+    std::string msg;
+    std::set<std::string> likes;
 
 public:
-    Message(int id = 0, std::string username = "", std::string msg = ""){
-        this->id = id;
-        this->username = username;
-        this->msg = msg;
-
-    }
+    Message(int id, std::string username, std::string msg) : id{id}, username{username}, msg{msg}{}
 
     friend std::ostream &operator<<(std::ostream& os, const Message& message){
         os << message.getId() << ":" << message.username << " (" << message.msg << ")";
@@ -61,27 +57,41 @@ public:
 
     friend std::ostream &operator<<(std::ostream& os, Inbox& inbox){
         for(auto msg : inbox.getAll()){
-            os << *msg.second << "\n";
+            os << *msg << "\n";
         }
 
         return os;
     }
 
-    void receiveNew(Message* tweet){
+    void storeUnread(Message* tweet){
         this->allMsg[tweet->getId()] = tweet;
         this->unread[tweet->getId()] = tweet;
     }
 
-    // void store(Message* tweet){
-
-    // }
-
-    std::map<int, Message*> getAll(){
-        return this->allMsg;
+    void storeReaded(Message* tweet){
+        this->allMsg[tweet->getId()] = tweet;
     }
 
-    std::map<int, Message*>* getUnread(){
-        return &this->unread;
+    std::vector<Message*> getAll(){
+        std::vector<Message*> temp;
+
+        for(auto message : this->allMsg){
+            temp.push_back(message.second);
+        }
+
+        return temp;
+    }
+
+    std::vector<Message*> getUnread(){
+        std::vector<Message*> temp;
+
+        for(auto message : this->unread){
+            temp.push_back(message.second);
+        }
+
+        this->unread.clear();
+
+        return temp;
     }
 
     Message* getTweet(int id){
@@ -115,7 +125,7 @@ public:
 
         for(auto followingSp : user.following){
             if(size < (int) user.following.size()){
-                os << followingSp.first << ",";
+                os << followingSp.first << ", ";
             }else{
                  os << followingSp.first; 
             }
@@ -130,7 +140,7 @@ public:
 
         for(auto followersSp : user.followers){
             if(size < (int) user.followers.size()){
-                os << followersSp.first << ",";
+                os << followersSp.first << ", ";
             }else{
                  os << followersSp.first; 
             }
@@ -157,10 +167,10 @@ public:
     }
 
     void sendTweet(Message* tw){
-       inbox.receiveNew(tw);
+       inbox.storeReaded(tw);
 
         for(auto foll : this->followers){
-            foll.second->getInbox()->receiveNew(tw);
+            foll.second->getInbox()->storeUnread(tw);
         }
     }
 
@@ -223,7 +233,7 @@ int main(){
         std::string linha{""};
         std::string comando{""};
 
-        // std::cout << "$";
+        std::cout << "$";
 
         getline(std::cin, linha);
 
@@ -288,14 +298,15 @@ int main(){
                 std::string username;
 
                 ss >> username;
-                for(auto msg : *controller.getUser(username)->getInbox()->getUnread()){
-                    std::cout << *msg.second << "\n";
+                for(auto msg : controller.getUser(username)->getInbox()->getUnread()){
+                    std::cout << *msg << "\n";
                 }
-
-                controller.getUser(username)->getInbox()->getUnread()->clear();
+            
+            }else if(comando == "end"){
+                break;
             
             }else{
-                break;
+                throw std::runtime_error("fail: comando invalido");
             }
         }
         catch(const std::exception& e) {
