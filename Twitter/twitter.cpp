@@ -2,8 +2,20 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <memory>
 #include <stdexcept>
 #include <sstream>
+
+class MessageException : public std::exception {
+   std::string message;
+public:
+    MessageException(const std::string& message) : 
+        message(message) {
+    }
+    const char* what() const noexcept override {
+        return message.c_str(); 
+    }
+};
 
 class Message{
     int id;
@@ -101,7 +113,7 @@ public:
             return it->second;
         
         }else{
-             throw std::runtime_error("fail: tweet nao existe");
+             throw MessageException("fail: tweet nao existe");
         }
     }
 
@@ -182,8 +194,8 @@ public:
 
 class Controller{
     int newTwID{0};
-    std::map<int, Message*> tweets;
-    std::map<std::string, User*> users;
+    std::map<int, std::shared_ptr<Message>> tweets;
+    std::map<std::string, std::shared_ptr<User>> users;
 
 public:
 
@@ -199,21 +211,19 @@ public:
 
     void addUser(std::string username){
         if(users.find(username) == users.end()){
-            users[username] = new User(username);
+            users[username] = std::make_shared<User>(username);
         
         }else{
-            throw std::runtime_error("fail: usuario ja cadastrado");
+            throw MessageException("fail: usuario ja cadastrado");
         }
     }
 
     User* getUser(std::string username){
-        auto it = users.find(username);
-
-        if(it != users.end()){
-            return it->second;
+        if(users.find(username) != users.end()){
+            return this->users[username].get();
         
         }else{
-            throw std::runtime_error("fail: usuario nao encontrado");
+            throw MessageException("fail: usuario nao encontrado");
         }
 
     }
@@ -306,13 +316,11 @@ int main(){
                 break;
             
             }else{
-                throw std::runtime_error("fail: comando invalido");
+                throw MessageException("fail: comando invalido");
             }
         }
-        catch(const std::exception& e) {
-            std::cerr << e.what() << '\n';
+        catch(const MessageException& e) {
+            std::cout << e.what() << '\n';
         }
-        
-
     }
 }

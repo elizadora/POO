@@ -3,6 +3,19 @@
 #include <vector>
 #include <sstream>
 #include <memory>
+#include <stdexcept>
+#include <algorithm>
+
+class MessageException : public std::exception {
+   std::string message;
+public:
+    MessageException(const std::string& message) : 
+        message(message) {
+    }
+    const char* what() const noexcept override {
+        return message.c_str(); 
+    }
+};
 
 class IMedico;
 
@@ -30,12 +43,12 @@ public:
 
 class Paciente : public IPaciente{
 protected:
+    std::string id;
     std::string diagnostico;
     std::map<std::string, IMedico*> medicos;
-    std::string sender;
 
 public:
-    Paciente(std::string sender, std::string diagnostico) : sender{sender}, diagnostico{diagnostico} {}
+    Paciente(std::string id, std::string diagnostico) : id{id}, diagnostico{diagnostico} {}
     
     std::string toString() override{
         std::stringstream ss;
@@ -67,7 +80,7 @@ public:
     }
 
     std::string getId() override{
-        return this->sender;
+        return this->id;
     }
 
     std::vector<IMedico*> getMedicos() override{
@@ -80,17 +93,19 @@ public:
         return temp;
     }
 
-    void removerMedico(std::string medicoId) override{}
+    void removerMedico(std::string medicoId) override{
+        this->medicos.erase(medicoId);
+    }
 };
 
 class Medico : public IMedico{
-private:
+protected:
+    std::string id;
     std::string classe;
     std::map<std::string, IPaciente*> pacientes;
-    std::string sender;
 
 public:
-    Medico(std::string sender, std::string classe) : sender{sender}, classe{classe} {}
+    Medico(std::string id, std::string classe) : id{id}, classe{classe} {}
 
     std::string toString() override{
         std::stringstream ss;
@@ -122,7 +137,7 @@ public:
     }
 
     std::string getId() override{
-        return this->sender;
+        return this->id;
     }
 
     std::vector<IPaciente*> getPacientes() override{
@@ -135,7 +150,9 @@ public:
         return temp;
     }
 
-    void removerPaciente(std::string pacienteId) override{}
+    void removerPaciente(std::string pacienteId) override{
+        this->pacientes.erase(pacienteId);
+    }
 };
 
 class Hospital{
@@ -147,16 +164,42 @@ public:
     Hospital(){}
 
     void addMedico(std::shared_ptr<IMedico> medico){
-        medicos[medico->getId()] = medico;
+       if(this->medicos.find(medico->getId()) == this->medicos.end()){
+            medicos[medico->getId()] = medico;
+       }else{
+           throw MessageException("fail: medico ja cadastrado");
+       }
     }
 
     void addPaciente(std::shared_ptr<IPaciente> paciente){
-        pacientes[paciente->getId()] = paciente;
+        if(this->pacientes.find(paciente->getId()) == this->pacientes.end()){
+            pacientes[paciente->getId()] = paciente;
+        }else{
+            throw MessageException("fail: paciente ja cadastrado");
+        }
     }
 
-    void removerMedico(std::string sender) {}
+    void removerMedico(std::string id) {
+        if(this->medicos.find(id) != this->medicos.end()){
+            for(auto paciente : this->medicos[id].get()->getPacientes()){
+                paciente->removerMedico(id);
+            }
+            this->medicos.erase(id);
+        }else{
+            throw MessageException("fail: medico nao encontrado");
+        }
+    }
 
-    void removerPaciente(std::string sender) {}
+    void removerPaciente(std::string id) {
+        if(this->pacientes.find(id) != this->pacientes.end()){
+            for(auto medico : this->pacientes[id].get()->getMedicos()){
+                medico->removerPaciente(id);
+            }
+            this->pacientes.erase(id);
+        }else{
+            throw MessageException("fail: paciente nao encontrado");
+        }
+    }
 
     std::string showAll(){
         std::stringstream ss;
@@ -173,11 +216,30 @@ public:
     }
 
     void vincular(std::string medicoId, std::string pacienteId){
-        IPaciente* pac = this->pacientes[pacienteId].get();
-        this->medicos[medicoId]->addPaciente(pac);
 
-        IMedico* med = this->medicos[medicoId].get();
-        this->pacientes[pacienteId]->addMedico(med);
+        if((this->pacientes.find(pacienteId) == this->pacientes.end()) || this->medicos.find(medicoId) == this->medicos.end()){
+            throw MessageException("fail: paciente/medico incorreto");
+        
+        }else{
+            auto pacientesMed = this->pacientes[pacienteId].get()->getMedicos();
+            if(std::find(pacientesMed.begin(), pacientesMed.end(), this->medicos[medicoId].get()) != pacientesMed.end()){
+                throw MessageException("fail: medico e paciente ja vinculados");
+            }else{
+                for(auto medico : this->pacientes[pacienteId].get()->getMedicos()){
+                    if(medico->getClasse() == this->medicos[medicoId]->getClasse()){
+                        throw MessageException("fail: ja existe outro medico com a especialidade " + this->medicos[medicoId]->getClasse());
+                    }
+                }
+
+                this->medicos[medicoId]->addPaciente(this->pacientes[pacienteId].get());
+                this->pacientes[pacienteId]->addMedico(this->medicos[medicoId].get());
+            }
+        }
+    }
+
+    void desvincular(std::string medicoId, std::string pacienteId){
+        this->medicos[medicoId]->removerPaciente(this->pacientes[pacienteId]->getId());
+        this->pacientes[pacienteId]->removerMedico(this->medicos[medicoId]->getId());
     }
     
 };
@@ -198,7 +260,8 @@ int main() {
 
         ss >> comando;
 
-        if(comando == "addPacs"){
+        try{
+            if(comando == "addPacs"){
             std::string temp;
 
             while(ss >> temp){
@@ -210,32 +273,63 @@ int main() {
                hospital.addPaciente(std::make_shared<Paciente>(paciente, diagnostico));
             }
 
-        }else if(comando == "addMeds"){
-            std::string temp;
+            }else if(comando == "addMeds"){
+                std::string temp;
 
-            while(ss >> temp){
-               int pos = temp.find("-");
+                while(ss >> temp){
+                int pos = temp.find("-");
 
-               std::string sender = temp.substr(0, pos);
-               std::string classe = temp.substr(pos + 1);
+                std::string id = temp.substr(0, pos);
+                std::string classe = temp.substr(pos + 1);
 
-               hospital.addMedico(std::make_shared<Medico>(sender, classe));
+                hospital.addMedico(std::make_shared<Medico>(id, classe));
+                }
+
+            }else if(comando == "rmPac"){
+                std::string pacId;
+
+                ss >> pacId;
+
+                hospital.removerPaciente(pacId);
+            
+            }else if(comando == "rmMed"){
+                std::string medId;
+
+                ss >> medId;
+
+                hospital.removerMedico(medId);
+            
+            }else if(comando == "show"){
+                std::cout << hospital.showAll();
+            
+            }else if(comando == "tie"){
+                std::string medId;
+                std::string pacId;
+
+                ss >> medId;
+
+                while(ss >> pacId){
+                    hospital.vincular(medId, pacId);
+                }
+            
+            }else if(comando == "untie"){
+                std::string medId;
+                std::string pacId;
+
+                ss >> medId >> pacId;
+
+            }else if(comando == "end"){
+                break;
+            
+            }else{
+                throw MessageException("fail: comando invalido");
             }
-
-        }else if(comando == "show"){
-            std::cout << hospital.showAll();
-        
-        }else if(comando == "tie"){
-            std::string medId;
-            std::string pacId;
-
-            ss >> medId;
-
-            while(ss >> pacId){
-                hospital.vincular(medId, pacId);
-            }
+ 
         }
-
+        catch(MessageException& e){
+            std::cout << e.what() << '\n';
+        }
+        
 
     }
     
