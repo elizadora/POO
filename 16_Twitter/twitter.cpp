@@ -153,10 +153,16 @@ public:
     }
 
     void rmMsgFrom(const std::string username){
+        std::vector<int> keys;
+
         for(auto tweet : this->timeline){
             if(tweet.second->getSender() == username){
-                this->timeline.erase(tweet.second->getId());
+                keys.push_back(tweet.first);
             }
+        }
+
+        for(auto key : keys){
+            this->timeline.erase(key);
         }
     }
 
